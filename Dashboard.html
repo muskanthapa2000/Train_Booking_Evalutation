@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Page</title>
+</head>
+<style>
+    nav{
+        display: flex;
+        justify-content: space-between;
+        background-color: black;
+        height: 30%;
+        padding: 1%;
+        margin: 1%;
+    }
+    a{
+        color: white; 
+    }
+  /* #div{
+    border: 2px solid black;
+  } */
+  /* label{
+    border: 2px solid black;
+  } */
+  table, th, td  {
+            border: 1px solid black;
+        }
+
+</style>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="Dashboard.html">Dashboard</a>
+            <a href="Booking.html">Booking </a>
+        </nav>
+    </header>
+    <h1>Dashboard Page</h1>
+    <div id = "div">
+
+        <label for="filterbySeat">Filter by Seat Type:</label>
+        <select id="filterbySeat">
+            <option value="">All</option>
+            <option value="AC First Class">AC First Class</option>
+            <option value="Sleeper Class">Sleeper Class</option>
+            <option value="Second Class">Second Class</option>
+            <option value="General">General</option>
+        </select>
+
+        <label for="sortbyAge">Sort by Age:</label>
+        <select id="sortbyAge">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+        
+
+        <label for="sortbyDate">Sort by Journey Date:</label>
+        <select id="sortbyDate">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Unique Id</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Selected Station</th>
+                    <th>To Station</th>
+                    <th>Journey Date</th>
+                    <th>Seat Type</th>
+                    <th>OTP</th>
+                    <th>Reject</th>
+                    <th>Confirm</th>
+                </tr>
+            </thead>
+            <tbody id="userDetail"></tbody>
+        </table>
+
+    </div>
+       
+    <script>
+   
+        const userData = JSON.parse(localStorage.getItem("booking")) || [];
+
+        function generateOTP() {
+            return Math.floor(1000 + Math.random() * 9000);
+        }
+
+        document.getElementById("filterbySeat").addEventListener("change", updateData);
+        document.getElementById("sortbyAge").addEventListener("change", updateData);
+        document.getElementById("sortbyDate").addEventListener("change", updateData);
+
+        updateData();
+
+        function updateData() {
+            const selectedSeat = document.getElementById("filterbySeat").value;
+            const sortAge = document.getElementById("sortbyAge").value;
+            const sortDate = document.getElementById("sortbyDate").value;
+
+            let folteredData = userData;
+
+
+            if (selectedSeat !== "") {
+                folteredData = folteredData.filter(user => user.Seat === selectedSeat);
+            }
+
+            
+
+            // if (sortOrderAge === "asc") {
+            //     filteredUsers.sort((a, b) => a.age - b.age);
+            // } else if (sortOrderAge === "desc") {
+            //     filteredUsers.sort((a, b) => b.age - a.age);
+            // }
+      
+                if (sortAge === "asc") {
+                    folteredData.sort((a, b) => parseInt(a.age) - parseInt(b.age));
+                } else if (sortAge === "desc") {
+                    folteredData.sort((a, b) => parseInt(b.age) - parseInt(a.age));
+                }
+                console.log(folteredData);
+
+
+            if (sortDate === "asc") {
+                folteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } else if (sortDate === "desc") {
+                folteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            displayAllUsers(folteredData);
+        }
+
+        // console.log(userData);
+
+        function displayAllUsers(data) {
+            document.getElementById("userDetail").innerHTML = "";
+            data.forEach(user => {
+                const otp = generateOTP();
+                var tr = document.createElement("tr");
+
+                var td1 = document.createElement("td");
+                td1.textContent = user.id;
+
+                var td2 = document.createElement("td");
+                td2.textContent = user.name;
+
+                var td3 = document.createElement("td");
+                td3.textContent = user.age;
+
+                var td4 = document.createElement("td");
+                td4.textContent = user.select_station;
+
+                var td5 = document.createElement("td");
+                td5.textContent = user.to_station;
+
+                var td6 = document.createElement("td");
+                td6.textContent = user.date;
+
+                var td7 = document.createElement("td");
+                td7.textContent = user.Seat;
+
+                var td8 = document.createElement("td");
+                td8.textContent = otp;
+
+                var td9 = document.createElement("td");
+                var rejectButton = document.createElement("button");
+                rejectButton.textContent = "Reject";
+                rejectButton.style.backgroundColor = "red"; 
+                rejectButton.addEventListener("click", function() {
+                    deleteData(user.id);
+                });
+                td9.append(rejectButton);
+
+
+                var td10 = document.createElement("td");
+                var confirmButton = document.createElement("button");
+                confirmButton.textContent = "Confirm";
+                confirmButton.style.backgroundColor = "green"; 
+                confirmButton.addEventListener("click", function() {
+                    confirmData(user.id, otp);
+                });
+                td10.append(confirmButton);
+
+                tr.append(td1, td2, td3, td4, td5, td6, td7, td8, td9, td10);
+                document.querySelector("#userDetail").append(tr);
+            });
+        }
+
+        function deleteData(id) {
+            const userIndex = userData.findIndex(user => user.id === id);
+
+            if (userIndex !== -1) {
+                userData.splice(userIndex, 1);
+                localStorage.setItem("booking", JSON.stringify(userData));
+                updateData();
+            }
+        }
+
+        function confirmData(id, otp) {
+            const userInputOTP = prompt("Enter OTP");
+
+            if (userInputOTP === otp.toString()) {
+                const confirmOTP = userData.find(user => user.id === id);
+                if (confirmOTP) {
+                    alert(`${confirmOTP.name} added to waiting list`);
+                    setTimeout(() => {
+                        alert(`Ticket Booked from ${confirmOTP.select_station} to ${confirmOTP.to_station}`);
+                    }, 5000);
+                    setTimeout(() => {
+                        alert(`Ticket booked for ${confirmOTP.date}`);
+                        localStorage.setItem(`confirmed-ticket-${id}`, JSON.stringify(confirmOTP));
+                        deleteData(id);
+                        // window.location.href("booking.html")
+                    }, 10000);
+                } else {
+                    alert("Data not found");
+                }
+            } else {
+                alert("Invalid OTP");
+            }
+        }
+    </script>
+</body>
+</html>

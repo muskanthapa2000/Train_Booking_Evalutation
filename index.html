@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+</head>
+<style>
+    nav{
+        display: flex;
+        justify-content: space-between;
+        background-color: black;
+        height: 30%;
+        padding: 1%;
+        margin: 1%;
+    }
+    a{
+        color: white; 
+    }
+    button{
+        color: white;
+        background-color: black;
+        
+    }
+
+</style>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="Dashboard.html">Dashboard</a>
+            <a href="Booking.html">Booking </a>
+        </nav>
+    </header>
+    <h1>Registration Page</h1>
+
+  
+        <form id="registered">
+            <label for="uniqueId">Unique ID:</label>
+            <input type="text" id="uniqueId" required>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" minlength="4" required><br><br>
+
+            <label for="age">Age:</label>
+            <input type="number" min="18" max="40" id="age" required><br><br>
+
+            <label for="from">Select Station:</label>
+            <select id="from">
+                <option value="Banglore">Banglore</option>
+                <option value="Pune">Pune</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Mumbai">Mumbai</option>
+            </select>
+
+            <label for="to">To Station:</label>
+            <select id="to">
+                <option value="Banglore">Banglore</option>
+                <option value="Pune">Pune</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Mumbai">Mumbai</option>
+            </select><br><br>
+
+            <label for="date">Journey Date:</label>
+            <input type="date" id="date" required><br><br>
+
+            <label for="Seat">Seat Type:</label>
+            <select id="Seat">
+                <option value="AC First Class">AC First Class</option>
+                <option value="Sleeper Class">Sleeper Class</option>
+                <option value="Second Class">Second Class</option>
+                <option value="General">General</option>
+            </select><br><br>
+
+            <button id="registerButton">Register</button>
+        </form>
+ 
+    <script>
+        document.getElementById("registered").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            var data = JSON.parse(localStorage.getItem("booking")) || [];
+            const id = document.getElementById("uniqueId").value;
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
+            const select_station = document.getElementById("from").value;
+            const to_station = document.getElementById("to").value;
+            const date = document.getElementById("date").value;
+            const Seat = document.getElementById("Seat").value;
+
+            if (select_station === to_station) {
+                alert("stations cannot be the same.");
+                return;
+            }
+
+            let isId = data.some(user => user.id === id);
+
+            if (isId) {
+                alert("ID already exists please enter another one");
+                return;
+            } else {
+                const storedData = { id, name, age, select_station, to_station, date, Seat };
+                data.push(storedData);
+                localStorage.setItem("booking", JSON.stringify(data));
+                window.location.href = "dashboard.html";
+            }
+        });
+    </script>
+</body>
+</html>

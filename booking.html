@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Page</title>
+    <style>
+    nav{
+        display: flex;
+        justify-content: space-between;
+        background-color: black;
+        height: 30%;
+        padding: 1%;
+        margin: 1%;
+    }
+    a{
+        color: white; 
+    }
+  table, th, td  {
+            border: 1px solid black;
+        }
+
+</style>
+</head>
+<body>
+    <header>
+        <nav id = "nav">
+            <a href="index.html">Home</a>
+            <a href="Dashboard.html">Dashboard</a>
+            <a href="Booking.html">Booking</a>
+        </nav>
+    </header>
+    <h1>Booking Page</h1>
+    <div class="filters">
+        <label for="filterSeat">Filter by Seat Type:</label>
+        <select id="filterSeat">
+            <option value="">All</option>
+            <option value="AC First Class">AC First Class</option>
+            <option value="Sleeper Class">Sleeper Class</option>
+            <option value="Second Class">Second Class</option>
+            <option value="General">General</option>
+        </select>
+
+        <label for="sortAge">Sort by Age:</label>
+        <select id="sortAge">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+
+        <label for="sortDate">Sort by Journey Date:</label>
+        <select id="sortDate">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Unique Id</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Selected Station</th>
+                <th>To Station</th>
+                <th>Journey Date</th>
+                <th>Seat Type</th>
+            </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+    </table>
+
+    
+    <script>
+        const bookedUserData = [];
+        for (let key in localStorage) {
+            if (key.startsWith("confirmed-ticket-")) {
+                const user = JSON.parse(localStorage.getItem(key));
+                bookedUserData.push(user);
+          }  
+        }
+
+        document.getElementById("filterSeat").addEventListener("change", updateTable);
+        document.getElementById("sortAge").addEventListener("change", updateTable);
+        document.getElementById("sortDate").addEventListener("change", updateTable);
+
+        updateTable();
+
+        function updateTable() {
+            const selectedSeat = document.getElementById("filterSeat").value;
+            const sortOrderAge = document.getElementById("sortAge").value;
+            const sortOrderDate = document.getElementById("sortDate").value;
+
+            let filteredUsers = bookedUserData;
+
+            if (selectedSeat !== "") {
+                filteredUsers = filteredUsers.filter(user => user.Seat === selectedSeat);
+            }
+
+            if (sortOrderAge === "asc") {
+            filteredUsers.sort((a, b) => a.age - b.age);
+        } else if (sortOrderAge === "desc") {
+            filteredUsers.sort((a, b) => b.age - a.age);
+        }
+
+            if (sortOrderDate === "asc") {
+                filteredUsers.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } else if (sortOrderDate === "desc") {
+                filteredUsers.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            displayAllUsers(filteredUsers);
+        }
+
+        function displayAllUsers(data) {
+            document.getElementById("userTableBody").innerHTML = "";
+            data.forEach(user => {
+                var tr = document.createElement("tr");
+
+                var td1 = document.createElement("td");
+                td1.textContent = user.id;
+
+                var td2 = document.createElement("td");
+                td2.textContent = user.name;
+
+                var td3 = document.createElement("td");
+                td3.textContent = user.age;
+
+                var td4 = document.createElement("td");
+                td4.textContent = user.select_station;
+
+                var td5 = document.createElement("td");
+                td5.textContent = user.to_station;
+
+                var td6 = document.createElement("td");
+                td6.textContent = user.date;
+
+                var td7 = document.createElement("td");
+                td7.textContent = user.Seat;
+
+                tr.append(td1, td2, td3, td4, td5, td6, td7);
+                document.querySelector("#userTableBody").append(tr);
+            });
+        }
+    </script>
+</body>
+</html>
